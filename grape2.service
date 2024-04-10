@@ -17,9 +17,10 @@ RestartSec=10
 
 User=root
 
-# run this before
-#   "journalctl -u grape2.service" is 'better', this just demonstrates running
-#   some command before the main one
+# run before starting to ensure the FIFO is present
+ExecStartPre=-mkdir -p /var/run/grape2
+ExecStartPre=-mkfifo /var/run/grape2/datactrlr.fifo
+# "journalctl -u grape2.service" is 'better' for log info
 ExecStartPre=/usr/bin/bash -c 'echo "Starting service..."; date -u -Is >> /home/pi/test.log; env >> /home/pi/test.log'
 
 # the main process to run
@@ -39,7 +40,7 @@ EnvironmentFile=-/etc/default/grape2.env
 #   send the "r\n" to datactrlr to command it to actually start its stuff.
 ExecStartPost=/usr/bin/bash -c 'sleep 5; echo "r" >> /var/run/grape2/datactrlr.fifo'
 
-# run this when you say "systemctl stop grape2.service"
+# run this when you say "systemctl stop grape2.service" or at system shutdown/reboot
 # otherwise it gets send a SIGTERM signal
 #   emulate the behavior of G2console.py
 ExecStop=/usr/bin/bash -c '(printf "\x1b"; sleep 0.1; echo "q") >> /var/run/grape2/datactrlr.fifo'
