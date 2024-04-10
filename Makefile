@@ -25,15 +25,15 @@ install: $(SERVICE).service $(SERVICE).env
 	#install --mode=755 $(SERVICE) $(PREFIX)/bin/
 	install --mode=600 $(SERVICE).env /etc/default/
 	install --mode=644 $(SERVICE).service /usr/lib/systemd/system/
-	install -d /var/run/$(SERVICE)
-	mkfifo /var/run/$(SERVICE)/datactrlr.fifo
+	-install -d /var/run/$(SERVICE)
+	-mkfifo /var/run/$(SERVICE)/datactrlr.fifo
 
 
 uninstall: disable
 	#rm $(PREFIX)/bin/$(SERVICE)
-	rm /etc/default/$(SERVICE).env
-	rm /usr/lib/systemd/system/$(SERVICE).service
-	rm /var/run/$(SERVICE)/datactrlr.fifo
+	-rm /etc/default/$(SERVICE).env
+	-rm /usr/lib/systemd/system/$(SERVICE).service
+	-rm /var/run/$(SERVICE)/datactrlr.fifo
 
 enable: install
 	systemctl enable $(SERVICE).service
@@ -48,8 +48,8 @@ reload:
 	systemctl daemon-reload
 
 disable: stop
-	systemctl disable $(SERVICE).service
+	-systemctl disable $(SERVICE).service
 
 stop:
-	systemctl stop $(SERVICE).service
+	-systemctl stop $(SERVICE).service
 
